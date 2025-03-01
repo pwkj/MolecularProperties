@@ -6,7 +6,7 @@ import molecularintegrals.integrals_1e as integrals_1e
 mol = pyscf.gto.Mole()
 #mol.atom = 'H 0 0 0; H 0 0 0.74'
 mol.atom = 'H 0 0 0'
-mol.basis = "6-31G"
+mol.basis = "cc-pvdz"
 mol.charge = 0
 mol.spin = 1 #spin is the number of unpaired electrons 2S, i.e. the difference between the number of alpha and beta electrons.
 mol.build()

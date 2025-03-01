@@ -9,19 +9,21 @@ class integral_provider:
 		molecule_object_: Molecule class object.
 		"""
 
-
 		self.molecule_object = molecule_object
-
 
 		# Run RHF:
 		mf = pyscf.scf.RHF(self.molecule_object)
-		mf.verbose = 0
+		mf.verbose = 2
 		mf.kernel()
+		print("HF = ",mf.e_tot)
 
-		# Get MO:
+		# Molecular orbitals:
 		self.c_mo = mf.mo_coeff
 
+		# Number of orbitals:
+		self.n_orbs = len(mf.mo_coeff)
 
+		
 	def overlap_matrix(self) -> np.ndarray:
 		"""Compute overlap integral matrix.
 		Returns:
@@ -34,13 +36,21 @@ class integral_provider:
 		return S_MO
 
 
-	def orbital_angular_momentum(self) -> np.ndarray:
-		"""Compute orbital angular momentum.
+	def orbital_angular_momentum(self)  -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+		"""Compute  mu_B*<0|l_i|n>, where l_i=r cross p is the angular momentum operator.
 	    Returns:
 	        orbital angular momentum.
 	    """
-
-		L_x_MO, L_y_MO, L_z_MO = np.einsum('uj,xuv,vi->xij',  self.c_mo, self.molecule_object.intor("int1e_cg_irxp", comp=3),  self.c_mo)
+		with self.molecule_object.with_common_origin((0, 0, 0)):
+			#print(self.molecule_object.intor("int1e_cg_irxp", comp=3))
+			L_x_MO, L_y_MO, L_z_MO = np.einsum('uj,xuv,vi->xij',  self.c_mo, self.molecule_object.intor("int1e_cg_irxp", comp=3),  self.c_mo)
 
 		return L_x_MO, L_y_MO, L_z_MO
+
+
+
+
+
+
+
 
